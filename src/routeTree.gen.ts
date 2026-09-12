@@ -11,7 +11,11 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ActivitiesRouteImport } from './routes/activities'
+import { Route as BreatheRouteImport } from './routes/breathe'
+import { Route as JournalRouteImport } from './routes/journal'
 import { Route as MoodRouteImport } from './routes/mood'
+import { Route as MoodLogRouteImport } from './routes/mood-log'
+import { Route as TimerRouteImport } from './routes/timer'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -23,40 +27,98 @@ const ActivitiesRoute = ActivitiesRouteImport.update({
   path: '/activities',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BreatheRoute = BreatheRouteImport.update({
+  id: '/breathe',
+  path: '/breathe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JournalRoute = JournalRouteImport.update({
+  id: '/journal',
+  path: '/journal',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MoodRoute = MoodRouteImport.update({
   id: '/mood',
   path: '/mood',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MoodLogRoute = MoodLogRouteImport.update({
+  id: '/mood-log',
+  path: '/mood-log',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TimerRoute = TimerRouteImport.update({
+  id: '/timer',
+  path: '/timer',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/activities': typeof ActivitiesRoute
+  '/breathe': typeof BreatheRoute
+  '/journal': typeof JournalRoute
   '/mood': typeof MoodRoute
+  '/mood-log': typeof MoodLogRoute
+  '/timer': typeof TimerRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/activities': typeof ActivitiesRoute
+  '/breathe': typeof BreatheRoute
+  '/journal': typeof JournalRoute
   '/mood': typeof MoodRoute
+  '/mood-log': typeof MoodLogRoute
+  '/timer': typeof TimerRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/activities': typeof ActivitiesRoute
+  '/breathe': typeof BreatheRoute
+  '/journal': typeof JournalRoute
   '/mood': typeof MoodRoute
+  '/mood-log': typeof MoodLogRoute
+  '/timer': typeof TimerRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/activities' | '/mood'
+  fullPaths:
+    | '/'
+    | '/activities'
+    | '/breathe'
+    | '/journal'
+    | '/mood'
+    | '/mood-log'
+    | '/timer'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/activities' | '/mood'
-  id: '__root__' | '/' | '/activities' | '/mood'
+  to:
+    | '/'
+    | '/activities'
+    | '/breathe'
+    | '/journal'
+    | '/mood'
+    | '/mood-log'
+    | '/timer'
+  id:
+    | '__root__'
+    | '/'
+    | '/activities'
+    | '/breathe'
+    | '/journal'
+    | '/mood'
+    | '/mood-log'
+    | '/timer'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ActivitiesRoute: typeof ActivitiesRoute
+  BreatheRoute: typeof BreatheRoute
+  JournalRoute: typeof JournalRoute
   MoodRoute: typeof MoodRoute
+  MoodLogRoute: typeof MoodLogRoute
+  TimerRoute: typeof TimerRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -75,11 +137,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ActivitiesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/breathe': {
+      id: '/breathe'
+      path: '/breathe'
+      fullPath: '/breathe'
+      preLoaderRoute: typeof BreatheRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/journal': {
+      id: '/journal'
+      path: '/journal'
+      fullPath: '/journal'
+      preLoaderRoute: typeof JournalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/mood': {
       id: '/mood'
       path: '/mood'
       fullPath: '/mood'
       preLoaderRoute: typeof MoodRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mood-log': {
+      id: '/mood-log'
+      path: '/mood-log'
+      fullPath: '/mood-log'
+      preLoaderRoute: typeof MoodLogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/timer': {
+      id: '/timer'
+      path: '/timer'
+      fullPath: '/timer'
+      preLoaderRoute: typeof TimerRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -88,7 +178,11 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ActivitiesRoute: ActivitiesRoute,
+  BreatheRoute: BreatheRoute,
+  JournalRoute: JournalRoute,
   MoodRoute: MoodRoute,
+  MoodLogRoute: MoodLogRoute,
+  TimerRoute: TimerRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

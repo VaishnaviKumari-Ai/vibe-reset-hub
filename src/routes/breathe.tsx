@@ -15,12 +15,14 @@ export const Route = createFileRoute("/breathe")({
   component: BreathePage,
 });
 
+type Phase = { label: string; seconds: number; scale: string };
+
 // One full breath cycle = 4s in, 4s hold, 6s out.
-const PHASES = [
+const PHASES: Phase[] = [
   { label: "Breathe in", seconds: 4, scale: "scale-100" },
   { label: "Hold", seconds: 4, scale: "scale-100" },
   { label: "Breathe out", seconds: 6, scale: "scale-50" },
-] as const;
+];
 
 function BreathePage() {
   const completeActivity = useVibeStore((s) => s.completeActivity);
@@ -29,47 +31,51 @@ function BreathePage() {
   const [done, setDone] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(0);
   const [phaseIndex, setPhaseIndex] = useState(0);
-  const [phaseLeft, setPhaseLeft] = useState(PHASES[0].seconds);
-  // useRef keeps the latest values available inside the interval callback.
-  const savedMinutes = useRef(minutes);
+  const [phaseLeft, setPhaseLeft] = useState(PHASES[0]!.seconds);
+  // A ref keeps the chosen length available inside the interval callback.
+  const chosenMinutes = useRef(minutes);
 
   useEffect(() => {
     if (!running) return;
 
     const id = setInterval(() => {
+      // 1) Count down the whole session.
       setSecondsLeft((s) => {
         if (s <= 1) {
           setRunning(false);
           setDone(true);
-          completeActivity("breathing", savedMinutes.current);
+          completeActivity("breathing", chosenMinutes.current);
           return 0;
         }
         return s - 1;
       });
 
+      // 2) Count down the current phase, moving to the next when it hits zero.
       setPhaseLeft((p) => {
-        if (p <= 1) {
-          setPhaseIndex((i) => (i + 1) % PHASES.length);
-          return PHASES[(phaseIndexRefValue(phaseIndex) + 1) % PHASES.length].seconds;
-        }
-        return p - 1;
+        if (p > 1) return p - 1;
+        let nextIndex = 0;
+        setPhaseIndex((i) => {
+          nextIndex = (i + 1) % PHASES.length;
+          return nextIndex;
+        });
+        return PHASES[nextIndex]!.seconds;
       });
     }, 1000);
 
     return () => clearInterval(id);
-  }, [running, phaseIndex, completeActivity]);
+  }, [running, completeActivity]);
 
   function start(mins: number) {
-    savedMinutes.current = mins;
+    chosenMinutes.current = mins;
     setMinutes(mins);
     setSecondsLeft(mins * 60);
     setPhaseIndex(0);
-    setPhaseLeft(PHASES[0].seconds);
+    setPhaseLeft(PHASES[0]!.seconds);
     setDone(false);
     setRunning(true);
   }
 
-  const phase = PHASES[phaseIndex];
+  const phase = PHASES[phaseIndex] ?? PHASES[0]!;
   const mm = String(Math.floor(secondsLeft / 60)).padStart(2, "0");
   const ss = String(secondsLeft % 60).padStart(2, "0");
 
@@ -94,6 +100,7 @@ function BreathePage() {
             <p className="mt-1 text-4xl font-bold text-gradient">
               {mm}:{ss}
             </p>
+            {running && <p className="mt-1 text-xs text-muted-foreground">{phaseLeft}s</p>}
           </div>
         </div>
 
@@ -142,9 +149,4 @@ function BreathePage() {
       </div>
     </PageShell>
   );
-}
-
-// Tiny helper so the phase maths above stays readable.
-function phaseIndexRefValue(i: number) {
-  return i;
 }
